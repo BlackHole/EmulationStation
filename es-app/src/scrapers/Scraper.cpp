@@ -45,13 +45,15 @@ void ScraperSearchHandle::update()
 
 	while(!mRequestQueue.empty())
 	{
-		auto& req = mRequestQueue.front();
-		AsyncHandleStatus status = req->status();
+		// a request can add more requests to the queue while running,
+		// so be careful with references into the queue
+		auto& req = *(mRequestQueue.front());
+		AsyncHandleStatus status = req.status();
 
 		if(status == ASYNC_ERROR)
 		{
 			// propegate error
-			setError(req->getStatusString());
+			setError(req.getStatusString());
 
 			// empty our queue
 			while(!mRequestQueue.empty())
